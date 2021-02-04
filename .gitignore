@@ -1,0 +1,13 @@
+target
+.DS_Store
+**/.vscode
+.settings
+.project
+.classpath
+testResults.csv
+.idea
+**iml
+node_modules
+**package-lock.json
+output.txt
+dependency-reduced-pom.xml
