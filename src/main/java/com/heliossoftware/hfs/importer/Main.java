@@ -2,6 +2,7 @@ package com.heliossoftware.hfs.importer;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 
@@ -31,7 +32,7 @@ public class Main {
 
   public static void main(String[] argv) throws Exception {
 
-
+    long startTime = System.currentTimeMillis();
     Args args = new Args();
     JCommander jct = JCommander.newBuilder()
             .addObject(args)
@@ -46,7 +47,10 @@ public class Main {
       return;
     }
 
-    Object obj = new ForkJoinPool(20).submit(getParallelRunnable()).join();
+    new ForkJoinPool(20).submit(getParallelRunnable()).join();
+    long endTime = System.currentTimeMillis();
+
+    System.out.println("\nTime elapsed: " + DurationFormatUtils.formatDuration(endTime - startTime, "HH:mm:ss"));
 
   }
 
@@ -62,8 +66,6 @@ public class Main {
     client.path("/fhir");
     HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
     conduit.getClient().setReceiveTimeout(0);
-
-    FilesystemAccess.FHIR_DATA_FORMAT format = fsa.getStyle(directory);
 
     return () -> {
       try {
