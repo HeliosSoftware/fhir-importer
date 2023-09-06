@@ -47,7 +47,7 @@ public class Main {
       return;
     }
 
-    new ForkJoinPool(20).submit(getParallelRunnable()).join();
+    new ForkJoinPool(1).submit(getParallelRunnable()).join();
     long endTime = System.currentTimeMillis();
 
     System.out.println("\nTime elapsed: " + DurationFormatUtils.formatDuration(endTime - startTime, "HH:mm:ss"));
