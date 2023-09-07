@@ -28,7 +28,7 @@ public class Main {
 
   private static String fileNameFilter;
 
-  private static Number threads;
+  private static int threads;
 
   private static int returnCode = 0;
 
@@ -46,14 +46,14 @@ public class Main {
     directory = args.directory;
     fhirUrl = args.url;
     fileNameFilter = args.fileNameFilter;
-    threads = args.threads;
+    threads =  Integer.parseInt(args.threads);
     contentType = args.contentType;
     if (args.help) {
       jct.usage();
       return;
     }
 
-    new ForkJoinPool(threads.intValue()).submit(getParallelRunnable()).join();
+    new ForkJoinPool(threads).submit(getParallelRunnable()).join();
     long endTime = System.currentTimeMillis();
 
     System.out.println("\nTime elapsed: " + DurationFormatUtils.formatDuration(endTime - startTime, "HH:mm:ss"));
@@ -132,7 +132,7 @@ public class Main {
     private String directory = "./";
 
     @Parameter(names = {"-t", "-threads"}, description = "Number of threads")
-    private Number threads = 20;
+    private String threads = "20";
 
     @Parameter(names = {"-url", "-server"}, description = "URL of FHIR Server, i.e. http://localhost:8181")
     private String url = "http://localhost:8181";
