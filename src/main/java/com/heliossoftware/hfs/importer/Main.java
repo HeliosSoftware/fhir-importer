@@ -81,7 +81,7 @@ public class Main {
         if (files.isEmpty()) {
           throw new IllegalStateException("No files found in directory " + directory);
         }
-        System.out.println("Submitting " + files.size() + " resources");
+        System.out.println("Submitting " + files.size() + " files");
         System.out.print("\rStatus: " + Main.count.get() * 100 / files.size() + "% [" + "_".repeat(20) + "]");
         files.parallelStream()
                 .forEach(submitFile(client, outputStream, files.size()));
