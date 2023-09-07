@@ -24,11 +24,13 @@ public class Main {
 
   private static String fhirUrl;
 
-  private static String contentType = "application/fhir+json";
+  private static String contentType;
 
-  private static String fileNameFilter = "";
+  private static String fileNameFilter;
 
-  private static Number threads = 20;
+  private static Number threads;
+
+  private static int returnCode = 0;
 
   private static volatile AtomicInteger count = new AtomicInteger(0);
 
@@ -45,6 +47,7 @@ public class Main {
     fhirUrl = args.url;
     fileNameFilter = args.fileNameFilter;
     threads = args.threads;
+    contentType = args.contentType;
     if (args.help) {
       jct.usage();
       return;
@@ -55,6 +58,8 @@ public class Main {
 
     System.out.println("\nTime elapsed: " + DurationFormatUtils.formatDuration(endTime - startTime, "HH:mm:ss"));
 
+    System.exit(returnCode);
+
   }
 
   static Runnable getParallelRunnable() throws Exception {
@@ -64,7 +69,6 @@ public class Main {
 
     OutputStream outputStream = new FileOutputStream(output);
     WebClient client = WebClient.create(fhirUrl);
-    // TODO make this configurable
     client.header(HttpHeaders.CONTENT_TYPE, contentType);
     client.path("/fhir");
     HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
@@ -83,6 +87,7 @@ public class Main {
                 .forEach(submitFile(client, outputStream, files.size()));
       } catch (IOException e) {
         e.printStackTrace();
+        returnCode = 1;
       }
     };
   }
@@ -93,7 +98,6 @@ public class Main {
     } else {
       String fhirPath = "/fhir/" + file.toPath().getParent().getFileName() + "/" + file.getName().split("\\.")[0];
       WebClient newClient = WebClient.create(fhirUrl);
-      // TODO make this configurable
       newClient.header(HttpHeaders.CONTENT_TYPE, contentType);
       newClient.replacePath(fhirPath);
       HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
@@ -108,6 +112,7 @@ public class Main {
       Response response = modifyWebClient(file, client).apply(file);
       if (response.getStatus() != 200 && response.getStatus() != 201) {
         System.out.println("ERROR for file " + file.getPath() + " " + response.getStatus());
+        returnCode = 1;
       }
       try {
         outputStream.write(((InputStream) response.getEntity()).readAllBytes());
@@ -117,6 +122,7 @@ public class Main {
         System.out.print("\rStatus: " + percentage + "% [" + "=".repeat(percentage / 5) + "_".repeat(20 - percentage / 5) + "]");
       } catch (IOException e) {
         System.err.println("Error writing to file");
+        returnCode = 1;
       }
     };
   }
@@ -133,6 +139,9 @@ public class Main {
 
     @Parameter(names = {"-regex", "-filter"}, description = "File name regex")
     private String fileNameFilter = "";
+
+    @Parameter(names = {"-c", "-contentType"}, description = "Content Type")
+    private String contentType = "application/fhir+json";
 
     @Parameter(names = {"--help", "-help", "-h"}, description = "This help menu")
     private boolean help = false;
