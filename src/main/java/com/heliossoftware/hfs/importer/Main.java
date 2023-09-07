@@ -28,6 +28,8 @@ public class Main {
 
   private static String fileNameFilter = "";
 
+  private static Number threads = 20;
+
   private static volatile AtomicInteger count = new AtomicInteger(0);
 
   public static void main(String[] argv) throws Exception {
@@ -42,12 +44,13 @@ public class Main {
     directory = args.directory;
     fhirUrl = args.url;
     fileNameFilter = args.fileNameFilter;
+    threads = args.threads;
     if (args.help) {
       jct.usage();
       return;
     }
 
-    new ForkJoinPool(20).submit(getParallelRunnable()).join();
+    new ForkJoinPool(threads.intValue()).submit(getParallelRunnable()).join();
     long endTime = System.currentTimeMillis();
 
     System.out.println("\nTime elapsed: " + DurationFormatUtils.formatDuration(endTime - startTime, "HH:mm:ss"));
@@ -121,6 +124,9 @@ public class Main {
   static class Args {
     @Parameter(names = {"-d", "-dir", "-directory", "-path"}, description = "Path to directory of Resource files")
     private String directory = "./";
+
+    @Parameter(names = {"-t", "-threads"}, description = "Number of threads")
+    private Number threads = 20;
 
     @Parameter(names = {"-url", "-server"}, description = "URL of FHIR Server, i.e. http://localhost:8181")
     private String url = "http://localhost:8181";
