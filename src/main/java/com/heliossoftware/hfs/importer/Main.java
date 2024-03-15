@@ -138,7 +138,7 @@ public class Main {
     private String url = "http://localhost:8181";
 
     @Parameter(names = {"-regex", "-filter"}, description = "File name regex")
-    private String fileNameFilter = "";
+    private String fileNameFilter = ".*.json";
 
     @Parameter(names = {"-c", "-contentType"}, description = "Content Type")
     private String contentType = "application/fhir+json";
