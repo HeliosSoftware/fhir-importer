@@ -99,6 +99,7 @@ public class Main {
       String fhirPath = "/fhir/" + file.toPath().getParent().getFileName() + "/" + file.getName().split("\\.")[0];
       WebClient newClient = WebClient.create(fhirUrl);
       newClient.header(HttpHeaders.CONTENT_TYPE, contentType);
+      newClient.header("Keep-Alive", "timeout=1800");
       newClient.replacePath(fhirPath);
       HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
       conduit.getClient().setReceiveTimeout(0);
